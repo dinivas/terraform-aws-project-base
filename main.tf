@@ -5,14 +5,14 @@
 module "mgmt_network" {
   #source              = "../terraform-os-network/"
   source              = "git@github.com:shepherdcloud/terraform-openstack-network.git"
-  network_name        = "${var.project_name}-mgmt-net"
+  network_name        = "${var.project_name}-mgmt"
   network_tags        = ["${var.project_name}", "management", "shepherdcloud"]
   network_description = "${var.project_description}"
 
   subnets = [
     {
       subnet_name       = "${var.project_name}-mgmt-subnet"
-      subnet_cidr       = "10.10.11.0/24"
+      subnet_cidr       = "${var.mgmt_subnet_cidr}"
       subnet_ip_version = 4
       subnet_tags       = "${var.project_name}, management, shepherdcloud"
     }
@@ -39,14 +39,14 @@ resource "openstack_networking_router_interface_v2" "router_interface_mgmt" {
 
 # ************************** Security Groups setup*********************************
 
-module "bastion_security_group" {
+# Common
+module "common_security_group" {
   #source      = "../terraform-os-security-group"
   source      = "git@github.com:shepherdcloud/terraform-openstack-security-group.git"
-  name        = "${var.project_name}-bastion"
-  description = "Bastion security group"
-  rules       = "${var.bastion_security_group_rules}"
+  name        = "${var.project_name}-common"
+  description = "${format("%s common security group", var.project_name)}"
+  rules       = "${var.common_security_group_rules}"
 }
-
 
 # ************************** Keypair setup*******************************************
 
@@ -59,13 +59,13 @@ module "bastion_generated_keypair" {
 
 resource "local_file" "bastion_private_key" {
   content  = "${module.bastion_generated_keypair.private_key}"
-  filename = "${var.bastion_private_key_output_directory != "" ? var.bastion_private_key_output_directory : path.module}/${var.project_name}-bastion.key"
+  filename = "${var.bastion_private_key_output_directory != "" ? var.bastion_private_key_output_directory : path.cwd}/${var.project_name}-bastion.key"
 }
 
 module "project_generated_keypair" {
   #source           = "../terraform-os-keypair"
   source           = "git@github.com:shepherdcloud/terraform-openstack-keypair.git"
-  name             = "${var.project_name}-keypair"
+  name             = "${var.project_name}"
   generate_ssh_key = true
 }
 
@@ -78,14 +78,14 @@ data "openstack_networking_floatingip_v2" "bastion_floatingip" {
   address = "${var.bastion_existing_floating_ip_to_use}"
 }
 
-resource "openstack_networking_floatingip_v2" "this" {
+resource "openstack_networking_floatingip_v2" "bastion_floatingip" {
   count = "${var.floating_ip_pool != "" ? 1 : 0}"
 
   pool = "${var.floating_ip_pool}"
 }
 
 locals {
-  bastion_floating_ip = "${var.bastion_existing_floating_ip_to_use != "" ? data.openstack_networking_floatingip_v2.bastion_floatingip.0.address : openstack_networking_floatingip_v2.this.0.address}"
+  bastion_floating_ip = "${var.bastion_existing_floating_ip_to_use != "" ? data.openstack_networking_floatingip_v2.bastion_floatingip.0.address : openstack_networking_floatingip_v2.bastion_floatingip.0.address}"
 }
 
 resource "openstack_compute_floatingip_associate_v2" "bastion_floatingip_associate" {
@@ -98,16 +98,18 @@ resource "openstack_compute_floatingip_associate_v2" "bastion_floatingip_associa
 # ************************** Compute (bastion) setup*********************************
 
 module "bastion_compute" {
-  #source               = "../terraform-os-compute"
-  source               = "git@github.com:shepherdcloud/terraform-openstack-instance.git"
-  instance_name        = "${var.project_name}-bastion"
-  image_name           = "${var.bastion_image_name}"
-  flavor_name          = "${var.bastion_compute_flavor_name}"
-  keypair              = "${module.bastion_generated_keypair.name}"
-  network_ids          = ["${module.mgmt_network.network_id}"]
-  subnet_ids           = ["${module.mgmt_network.subnet_ids}"]
-  security_group_name  = "${var.project_name}-sg"
-  security_group_rules = "${var.bastion_security_group_rules}"
+  source = "../terraform-os-compute"
+  #source               = "git@github.com:shepherdcloud/terraform-openstack-instance.git"
+  instance_name                 = "bastion-${var.project_name}"
+  image_name                    = "${var.bastion_image_name}"
+  flavor_name                   = "${var.bastion_compute_flavor_name}"
+  keypair                       = "${module.bastion_generated_keypair.name}"
+  network_ids                   = ["${module.mgmt_network.network_id}"]
+  subnet_ids                    = ["${module.mgmt_network.subnet_ids}"]
+  instance_security_group_name  = "${var.project_name}-bastion"
+  instance_security_group_rules = "${var.bastion_security_group_rules}"
+  security_groups_to_associate  = ["${module.common_security_group.name}"]
+  metadata                      = "${var.metadata}"
 }
 
 
