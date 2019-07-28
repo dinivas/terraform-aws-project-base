@@ -1,6 +1,6 @@
-# shepherd
+# Dinivas Terraform bas project
 
-Introduce your module briefly.
+This module will create the project base archi for Dinivas
 
 ## Usage
 

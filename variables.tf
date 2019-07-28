@@ -65,7 +65,7 @@ variable "common_security_group_rules" {
       port_range_min    = 22
       port_range_max    = 22
       remote_ip_prefix  = ""
-      security_group_id = "shepherd-common-sg"
+      security_group_id = "dinivas-common-sg"
     },
     # Node exporter
     {
@@ -75,7 +75,7 @@ variable "common_security_group_rules" {
       port_range_min    = 9100
       port_range_max    = 9100
       remote_ip_prefix  = ""
-      security_group_id = "shepherd-common-sg"
+      security_group_id = "dinivas-common-sg"
     }
   ]
 }

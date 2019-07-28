@@ -1,7 +1,7 @@
-module "shepherdcloud_base" {
+module "dinivas_project_base" {
   source = "../../"
 
-  project_name                = "shepherd"
+  project_name                = "dinivas"
   project_description         = "This project is for demo purpose"
   public_router_name          = "router1"
   bastion_image_name          = "Centos 7"

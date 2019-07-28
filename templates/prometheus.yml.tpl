@@ -5,7 +5,7 @@ global:
   scrape_timeout: ${var.prometheus_evaluation_interval} # How long until a scrape request times out. Default 10s
   external_labels:
     project: ${var.project_name}
-    platform: shepherdcloud
+    platform: dinivas
 
 # Alertmanager configuration
 alerting:
