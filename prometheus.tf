@@ -33,7 +33,10 @@ resource "openstack_compute_floatingip_associate_v2" "prometheus_floatingip_asso
 data "template_file" "prometheus_config" {
   template = "${file("${path.module}/templates/prometheus.yml.tpl")}"
   vars = {
-    consul_address = "${aws_instance.consul.private_ip}"
+    project_name = "${var.project_name}"
+    prometheus_scrape_interval = "30s"
+    prometheus_evaluation_interval = "30s"
+    prometheus_scrape_timeout = "30s"
   }
 }
 

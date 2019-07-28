@@ -1,10 +1,10 @@
 # Prometheus
 global:
-  scrape_interval: ${var.prometheus_scrape_interval} # Set the scrape interval to every 15 seconds. Default is every 1 minute.
-  evaluation_interval: ${var.prometheus_evaluation_interval} # Evaluate rules every 15 seconds. The default is every 1 minute.
-  scrape_timeout: ${var.prometheus_evaluation_interval} # How long until a scrape request times out. Default 10s
+  scrape_interval: ${prometheus_scrape_interval} # Set the scrape interval to every 15 seconds. Default is every 1 minute.
+  evaluation_interval: ${prometheus_evaluation_interval} # Evaluate rules every 15 seconds. The default is every 1 minute.
+  scrape_timeout: ${prometheus_scrape_timeout} # How long until a scrape request times out. Default 10s
   external_labels:
-    project: ${var.project_name}
+    project: ${project_name}
     platform: dinivas
 
 # Alertmanager configuration
