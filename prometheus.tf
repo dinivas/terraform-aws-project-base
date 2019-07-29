@@ -47,12 +47,12 @@ resource "null_resource" "prometheus_configure" {
   }
 
   # provide some connection info
-  connection {
-    type        = "ssh"
-    user        = "root"
-    private_key = "${var.ssh_private_key}"
-    host        = "${element(var.public_ips, count.index)}"
-  }
+  # connection {
+  #   type        = "ssh"
+  #   user        = "root"
+  #   private_key = "${var.ssh_private_key}"
+  #   host        = "${element(var.public_ips, count.index)}"
+  # }
 
   provisioner "file" {
     content     = "${data.template_file.prometheus_config.rendered}"
