@@ -2,7 +2,7 @@
 
 module "prometheus_compute" {
   #source = "../terraform-os-compute"
-  source               = "git@github.com:dinivas/terraform-openstack-instance.git"
+  source               = "github.com/dinivas/terraform-openstack-instance"
 
   instance_name                 = "${var.project_name}-prometheus"
   image_name                    = "${var.prometheus_image_name}"

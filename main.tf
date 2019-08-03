@@ -4,7 +4,7 @@
 ## Management network
 module "mgmt_network" {
   #source              = "../terraform-os-network/"
-  source              = "git@github.com:dinivas/terraform-openstack-network.git"
+  source              = "github.com/dinivas/terraform-openstack-network"
   network_name        = "${var.project_name}-mgmt"
   network_tags        = ["${var.project_name}", "management", "dinivas"]
   network_description = "${var.project_description}"
@@ -42,7 +42,7 @@ resource "openstack_networking_router_interface_v2" "router_interface_mgmt" {
 # Common
 module "common_security_group" {
   #source      = "../terraform-os-security-group"
-  source      = "git@github.com:dinivas/terraform-openstack-security-group.git"
+  source      = "github.com/dinivas/terraform-openstack-security-group"
   name        = "${var.project_name}-common"
   description = "${format("%s common security group", var.project_name)}"
   rules       = "${var.common_security_group_rules}"
@@ -52,7 +52,7 @@ module "common_security_group" {
 
 module "bastion_generated_keypair" {
   #source           = "../terraform-os-keypair"
-  source           = "git@github.com:dinivas/terraform-openstack-keypair.git"
+  source           = "github.com/dinivas/terraform-openstack-keypair"
   name             = "${var.project_name}-bastion-generated-keypair"
   generate_ssh_key = true
 }
@@ -64,7 +64,7 @@ resource "local_file" "bastion_private_key" {
 
 module "project_generated_keypair" {
   #source           = "../terraform-os-keypair"
-  source           = "git@github.com:dinivas/terraform-openstack-keypair.git"
+  source           = "github.com/dinivas/terraform-openstack-keypair"
   name             = "${var.project_name}"
   generate_ssh_key = true
 }
@@ -99,7 +99,7 @@ resource "openstack_compute_floatingip_associate_v2" "bastion_floatingip_associa
 
 module "bastion_compute" {
   #source = "../terraform-os-compute"
-  source               = "git@github.com:dinivas/terraform-openstack-instance.git"
+  source               = "github.com/dinivas/terraform-openstack-instance"
   instance_name                 = "bastion-${var.project_name}"
   image_name                    = "${var.bastion_image_name}"
   flavor_name                   = "${var.bastion_compute_flavor_name}"
