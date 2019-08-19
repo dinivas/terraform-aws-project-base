@@ -29,3 +29,4 @@ Gemfile.lock
 
 # Local test-kitchen files.
 **/.kitchen/*
+*.key

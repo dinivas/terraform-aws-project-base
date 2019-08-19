@@ -26,6 +26,12 @@ variable "bastion_private_key_output_directory" {
   default     = ""
 }
 
+variable "external_network" {
+  type        = "string"
+  description = "The external network name"
+  default     = "public"
+}
+
 variable "floating_ip_pool" {
   type        = "string"
   description = "Pool name to retrieve floating ip"
@@ -56,28 +62,7 @@ variable "public_router_name" {
 variable "common_security_group_rules" {
   type        = list(map(any))
   description = "Common security group rules"
-  default = [
-    # ssh
-    {
-      direction         = "ingress"
-      ethertype         = "IPv4"
-      protocol          = "tcp"
-      port_range_min    = 22
-      port_range_max    = 22
-      remote_ip_prefix  = ""
-      security_group_id = "dinivas-common-sg"
-    },
-    # Node exporter
-    {
-      direction         = "ingress"
-      ethertype         = "IPv4"
-      protocol          = "tcp"
-      port_range_min    = 9100
-      port_range_max    = 9100
-      remote_ip_prefix  = ""
-      security_group_id = "dinivas-common-sg"
-    }
-  ]
+  default     = []
 }
 
 variable "bastion_security_group_rules" {
@@ -94,40 +79,40 @@ variable "bastion_security_group_rules" {
       direction        = "ingress"
       ethertype        = "IPv4"
       protocol         = "icmp"
-      port_range_min   = 0
-      port_range_max   = 0
       remote_ip_prefix = "0.0.0.0/0"
     },
   ]
 }
 
-variable "prometheus_security_group_rules" {
+variable "proxy_security_group_rules" {
   default = [
     {
       direction        = "ingress"
       ethertype        = "IPv4"
       protocol         = "tcp"
-      port_range_min   = 22
-      port_range_max   = 22
-      remote_ip_prefix = ""
-    },
-    {
-      direction        = "ingress"
-      ethertype        = "IPv4"
-      protocol         = "icmp"
-      port_range_min   = 0
-      port_range_max   = 0
-      remote_ip_prefix = ""
+      port_range_min   = 80
+      port_range_max   = 80
+      remote_ip_prefix = "0.0.0.0/0"
     },
     {
       direction        = "ingress"
       ethertype        = "IPv4"
       protocol         = "tcp"
-      port_range_min   = 9090
-      port_range_max   = 9090
+      port_range_min   = 443
+      port_range_max   = 443
+      remote_ip_prefix = "0.0.0.0/0"
+    },
+    {
+      direction        = "ingress"
+      ethertype        = "IPv4"
+      protocol         = "icmp"
       remote_ip_prefix = "0.0.0.0/0"
     }
   ]
+}
+
+variable "prometheus_security_group_rules" {
+  default = []
 }
 
 variable "metadata" {
@@ -138,6 +123,36 @@ variable "metadata" {
   }
 }
 
+variable enable_proxy {
+  type    = "string"
+  default = "1"
+}
+
+variable enable_prometheus {
+  type    = "string"
+  default = "0"
+}
+
+variable enable_logging_graylog {
+  type    = "string"
+  default = "0"
+}
+
+variable enable_logging_kibana {
+  type    = "string"
+  default = "0"
+}
+
+variable "proxy_image_name" {
+  type        = "string"
+  description = "The proxy compute image name."
+}
+
+variable "proxy_compute_flavor_name" {
+  type        = "string"
+  description = "The proxy compute flavor name."
+}
+
 variable "prometheus_image_name" {
   type        = "string"
   description = "The prometheus compute image name."
@@ -146,5 +161,4 @@ variable "prometheus_image_name" {
 variable "prometheus_compute_flavor_name" {
   type        = "string"
   description = "The prometheus compute flavor name."
-  default     = "m1.tiny"
 }

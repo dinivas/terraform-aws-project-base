@@ -1,9 +1,16 @@
 output "bastion_instance_id" {
   value       = "${module.bastion_compute.ids}"
 }
+
+output "bastion_private_key" {
+  value       = "${module.bastion_generated_keypair.private_key}"
+  description = "The generated private Key to access bastion"
+  sensitive   = true
+}
+
 output "bastion_private_key_file" {
   value       = "${local_file.bastion_private_key.filename}"
-  description = "The private Key (generated) to access bastion"
+  description = "The private Key file (generated) to access bastion"
 }
 
 output "mgmt_network_id" {
@@ -17,13 +24,18 @@ output "mgmt_subnet_ids" {
 }
 
 output "project_router_id" {
-  value       = "${openstack_networking_router_v2.project_router.id}"
+  value       = "${openstack_networking_router_v2.project_router.0.id}"
   description = "The project router id"
 }
 
 output "bastion_floating_ip" {
   value       = "${local.bastion_floating_ip}"
   description = "The floating ip bind to bastion"
+}
+
+output "proxy_floating_ip" {
+  value       = "${openstack_networking_floatingip_v2.proxy_floatingip.0.address}"
+  description = "The floating ip bind to proxy"
 }
 
 output "project_keypair_name" {

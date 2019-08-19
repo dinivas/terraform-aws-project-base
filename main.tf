@@ -23,17 +23,36 @@ module "mgmt_network" {
 
 ## Private router
 
-data "openstack_networking_network_v2" "public_network" {
-  name = "public"
+## Use existing public router when public_router_name is defined
+data "openstack_networking_router_v2" "public_router" {
+  count = "${var.public_router_name != "" ? 1 : 0}"
+
+  name = "${var.public_router_name}"
 }
 
+resource "openstack_networking_router_interface_v2" "public_router_interface_mgmt" {
+  count = "${var.public_router_name != "" ? 1 : 0}"
+
+  router_id = "${lookup(data.openstack_networking_router_v2.public_router[count.index], "id")}"
+  subnet_id = "${module.mgmt_network.subnet_ids[0]}"
+}
+
+## Use existing public router when public_router_name is defined
+
+data "openstack_networking_network_v2" "external_network" {
+  name = "${var.external_network}"
+}
 resource "openstack_networking_router_v2" "project_router" {
+  count = "${var.public_router_name == "" ? 1 : 0}"
+
   name                = "${var.project_name}-router"
   admin_state_up      = true
-  external_network_id = "${data.openstack_networking_network_v2.public_network.id}"
+  external_network_id = "${data.openstack_networking_network_v2.external_network.id}"
 }
-resource "openstack_networking_router_interface_v2" "router_interface_mgmt" {
-  router_id = "${openstack_networking_router_v2.project_router.id}"
+resource "openstack_networking_router_interface_v2" "project_router_interface_mgmt" {
+  count = "${var.public_router_name == "" ? 1 : 0}"
+
+  router_id = "${lookup(openstack_networking_router_v2.project_router[count.index], "id")}"
   subnet_id = "${module.mgmt_network.subnet_ids[0]}"
 }
 
@@ -42,10 +61,19 @@ resource "openstack_networking_router_interface_v2" "router_interface_mgmt" {
 # Common
 module "common_security_group" {
   #source      = "../terraform-os-security-group"
-  source      = "github.com/dinivas/terraform-openstack-security-group"
-  name        = "${var.project_name}-common"
-  description = "${format("%s common security group", var.project_name)}"
-  rules       = "${var.common_security_group_rules}"
+  source               = "github.com/dinivas/terraform-openstack-security-group"
+  name                 = "${var.project_name}-common"
+  description          = "${format("%s common security group", var.project_name)}"
+  delete_default_rules = "false"
+  rules                = "${var.common_security_group_rules}"
+}
+
+## Allow all ingress between instance of same security group
+resource "openstack_networking_secgroup_rule_v2" "common_remote_security_group" {
+  direction         = "ingress"
+  ethertype         = "IPv4"
+  remote_group_id   = "${tostring(module.common_security_group.id)}"
+  security_group_id = "${tostring(module.common_security_group.id)}"
 }
 
 # ************************** Keypair setup*******************************************
@@ -98,8 +126,8 @@ resource "openstack_compute_floatingip_associate_v2" "bastion_floatingip_associa
 # ************************** Compute (bastion) setup*********************************
 
 module "bastion_compute" {
-  #source = "../terraform-os-compute"
-  source               = "github.com/dinivas/terraform-openstack-instance"
+  source = "../terraform-os-compute"
+  #source                        = "github.com/dinivas/terraform-openstack-instance"
   instance_name                 = "bastion-${var.project_name}"
   image_name                    = "${var.bastion_image_name}"
   flavor_name                   = "${var.bastion_compute_flavor_name}"
