@@ -1,8 +1,8 @@
 # ******************************* Proxy setup ***********************************
 
 module "proxy_compute" {
-  source = "../terraform-os-compute"
-  #source = "github.com/dinivas/terraform-openstack-instance"
+  #source = "../terraform-os-compute"
+  source = "github.com/dinivas/terraform-openstack-instance"
 
   instance_name                 = "${var.project_name}-proxy"
   image_name                    = "${var.proxy_image_name}"
