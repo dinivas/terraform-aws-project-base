@@ -128,7 +128,7 @@ resource "openstack_compute_floatingip_associate_v2" "bastion_floatingip_associa
 module "bastion_compute" {
   #source = "../terraform-os-compute"
   source                        = "github.com/dinivas/terraform-openstack-instance"
-  instance_name                 = "bastion-${var.project_name}"
+  instance_name                 = "${var.project_name}-bastion"
   image_name                    = "${var.bastion_image_name}"
   flavor_name                   = "${var.bastion_compute_flavor_name}"
   keypair                       = "${module.bastion_generated_keypair.name}"
