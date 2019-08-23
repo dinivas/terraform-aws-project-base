@@ -37,9 +37,11 @@ resource "openstack_networking_router_interface_v2" "public_router_interface_mgm
   subnet_id = "${module.mgmt_network.subnet_ids[0]}"
 }
 
-## Use existing public router when public_router_name is defined
+## Create project router when no public router is defined
 
 data "openstack_networking_network_v2" "external_network" {
+  count = "${var.public_router_name == "" ? 1 : 0}"
+
   name = "${var.external_network}"
 }
 resource "openstack_networking_router_v2" "project_router" {
@@ -47,7 +49,7 @@ resource "openstack_networking_router_v2" "project_router" {
 
   name                = "${var.project_name}-router"
   admin_state_up      = true
-  external_network_id = "${data.openstack_networking_network_v2.external_network.id}"
+  external_network_id = "${data.openstack_networking_network_v2.external_network.0.id}"
 }
 resource "openstack_networking_router_interface_v2" "project_router_interface_mgmt" {
   count = "${var.public_router_name == "" ? 1 : 0}"
