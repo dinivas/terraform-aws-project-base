@@ -18,9 +18,19 @@ output "mgmt_network_id" {
   description = "The id of the Mgmt Network being created"
 }
 
+output "mgmt_network_name" {
+  value       = "${module.mgmt_network.network_name}"
+  description = "The name of the Mgmt Network being created"
+}
+
 output "mgmt_subnet_ids" {
   value       = "${module.mgmt_network.subnet_ids}"
   description = "The id of all mgmt subnets being created"
+}
+
+output "mgmt_subnet_names" {
+  value       = "${module.mgmt_network.subnet_names}"
+  description = "The names of all mgmt subnets being created"
 }
 
 output "project_router_id" {
