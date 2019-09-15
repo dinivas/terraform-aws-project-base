@@ -9,6 +9,12 @@ variable "project_description" {
   default     = ""
 }
 
+variable "project_availability_zone" {
+  type        = "string"
+  description = "The project availability zone."
+  default     = "null"
+}
+
 variable "mgmt_subnet_cidr" {
   type    = "string"
   default = "10.10.11.0/24"

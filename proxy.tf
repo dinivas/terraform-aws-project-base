@@ -15,6 +15,7 @@ module "proxy_compute" {
   security_groups_to_associate  = ["${module.common_security_group.name}"]
   metadata                      = "${var.metadata}"
   enabled                       = "${var.enable_proxy}"
+  availability_zone             = "${var.project_availability_zone}"
 }
 
 resource "openstack_networking_floatingip_v2" "proxy_floatingip" {

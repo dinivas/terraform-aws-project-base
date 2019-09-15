@@ -140,6 +140,7 @@ module "bastion_compute" {
   instance_security_group_rules = "${var.bastion_security_group_rules}"
   security_groups_to_associate  = ["${module.common_security_group.name}"]
   metadata                      = "${var.metadata}"
+  availability_zone             = "${var.project_availability_zone}"
 }
 
 
