@@ -25,8 +25,12 @@ scrape_configs:
     static_configs:
       - targets: ['localhost:9090']
 
-    # metrics_path defaults to '/metrics'
-    # scheme defaults to 'http'.
-
-    static_configs:
-    - targets: ['localhost:9090']
+  - job_name: consul
+    consul_sd_configs:
+      - server: 'localhost:8500'
+    relabel_configs:
+      - source_labels: [__meta_consul_tags]
+        regex: .*,monitor,.*
+        action: keep
+      - source_labels: [__meta_consul_service]
+        target_label: service
