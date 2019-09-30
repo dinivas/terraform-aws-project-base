@@ -168,3 +168,73 @@ variable "prometheus_compute_flavor_name" {
   type        = "string"
   description = "The prometheus compute flavor name."
 }
+
+# Project Consul variables
+
+variable "project_consul_enable" {
+  type    = "string"
+  default = "0"
+}
+
+variable "project_consul_domain" {
+  type        = "string"
+  description = "The domain name to use for the Consul cluster"
+}
+
+variable "project_consul_datacenter" {
+  type        = "string"
+  description = "The datacenter name for the consul cluster"
+}
+
+variable "project_consul_server_count" {
+  default = "1"
+}
+
+variable "project_consul_client_count" {
+  default = "1"
+}
+
+variable "project_consul_server_image_name" {
+  type        = "string"
+  description = "The compute image name used for Consul server."
+  default     = "Dinivas Base"
+}
+
+variable "project_consul_server_flavor_name" {
+  type        = "string"
+  description = "The compute flavor name used for Consul server."
+  default     = "dinivas.medium"
+}
+
+variable "project_consul_client_image_name" {
+  type        = "string"
+  description = "The compute image name used for Consul client."
+  default     = "Dinivas Base"
+}
+
+variable "project_consul_client_flavor_name" {
+  type        = "string"
+  description = "The compute flavor name used for Consul client."
+  default     = "dinivas.medium"
+}
+
+variable "os_auth_domain_name" {
+  type    = "string"
+  default = "default"
+}
+
+variable "os_auth_username" {
+  type = "string"
+}
+
+variable "os_auth_password" {
+  type = "string"
+}
+
+variable "os_auth_url" {
+  type = "string"
+}
+
+variable "os_project_id" {
+  type = "string"
+}

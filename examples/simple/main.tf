@@ -14,4 +14,11 @@ module "dinivas_project_base" {
   enable_prometheus              = "0"
   proxy_image_name               = "Centos 7"
   proxy_compute_flavor_name      = "m1.small"
+
+  project_consul_enable = "1"
+  project_consul_domain = "dinivas"
+  project_consul_datacenter = "gra"
+  project_consul_server_count = 3
+  project_consul_client_count = 1
+
 }
