@@ -1,24 +1,43 @@
+variable "os_auth_domain_name" {
+  type    = "string"
+  default = "default"
+}
+
+variable "os_auth_username" {}
+
+variable "os_auth_password" {}
+
+variable "os_auth_url" {}
+
+variable "os_project_id" {}
+
 module "dinivas_project_base" {
   source = "../../"
 
   project_name                   = "dinivas"
-  project_description            = "This project is for demo purpose"
+  project_description            = ""
+  project_availability_zone      = "nova:node03"
   public_router_name             = "router1"
-  mgmt_subnet_cidr               = "10.10.11.1/24"
-  bastion_image_name             = "Centos 7"
-  bastion_compute_flavor_name    = "m1.small"
+  mgmt_subnet_cidr               = "10.10.13.1/24"
+  bastion_image_name             = "Dinivas Base"
+  bastion_compute_flavor_name    = "dinivas.medium"
   bastion_ssh_user               = "centos"
   prometheus_image_name          = "ShepherdCloud Prometheus"
-  prometheus_compute_flavor_name = "m1.small"
+  prometheus_compute_flavor_name = "dinivas.medium"
   enable_proxy                   = "0"
   enable_prometheus              = "0"
-  proxy_image_name               = "Centos 7"
-  proxy_compute_flavor_name      = "m1.small"
+  proxy_image_name               = "Dinivas Base"
+  proxy_compute_flavor_name      = "dinivas.medium"
 
-  project_consul_enable = "1"
-  project_consul_domain = "dinivas"
-  project_consul_datacenter = "gra"
-  project_consul_server_count = 3
+  project_consul_enable       = "1"
+  project_consul_domain       = "dinivas"
+  project_consul_datacenter   = "gra"
+  project_consul_server_count = 2
   project_consul_client_count = 1
 
+  os_auth_domain_name = "${var.os_auth_domain_name}"
+  os_auth_username    = "${var.os_auth_username}"
+  os_auth_password    = "${var.os_auth_password}"
+  os_auth_url         = "${var.os_auth_url}"
+  os_project_id       = "${var.os_project_id}"
 }

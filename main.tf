@@ -127,6 +127,22 @@ resource "openstack_compute_floatingip_associate_v2" "bastion_floatingip_associa
 
 # ************************** Compute (bastion) setup*********************************
 
+data "template_file" "bastion_user_data" {
+  template = "${file("${path.module}/templates/bastion-user-data.tpl")}"
+
+  vars = {
+    consul_agent_mode         = "client"
+    consul_cluster_domain     = "${var.project_consul_domain}"
+    consul_cluster_datacenter = "${var.project_consul_datacenter}"
+    consul_cluster_name       = "${var.project_name}-consul"
+    os_auth_domain_name       = "${var.os_auth_domain_name}"
+    os_auth_username          = "${var.os_auth_username}"
+    os_auth_password          = "${var.os_auth_password}"
+    os_auth_url               = "${var.os_auth_url}"
+    os_project_id             = "${var.os_project_id}"
+  }
+}
+
 module "bastion_compute" {
   #source = "../terraform-os-compute"
   source                        = "github.com/dinivas/terraform-openstack-instance"
@@ -135,10 +151,11 @@ module "bastion_compute" {
   flavor_name                   = "${var.bastion_compute_flavor_name}"
   keypair                       = "${module.bastion_generated_keypair.name}"
   network_ids                   = ["${module.mgmt_network.network_id}"]
-  subnet_ids                    = ["${module.mgmt_network.subnet_ids}"]
+  subnet_ids                    = "${module.mgmt_network.subnet_ids}"
   instance_security_group_name  = "${var.project_name}-bastion"
   instance_security_group_rules = "${var.bastion_security_group_rules}"
   security_groups_to_associate  = ["${module.common_security_group.name}"]
+  user_data                     = "${data.template_file.bastion_user_data.rendered}"
   metadata                      = "${var.metadata}"
   availability_zone             = "${var.project_availability_zone}"
 }
