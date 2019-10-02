@@ -26,7 +26,7 @@ write_files:
           "datacenter": "${consul_cluster_datacenter}",
           "disable_update_check": false,
           "domain": "${consul_cluster_domain}",
-          "enable_local_script_checks": false,
+          "enable_local_script_checks": true,
           "enable_script_checks": false,
           "log_file": "/var/log/consul/consul.log",
           "log_level": "INFO",
