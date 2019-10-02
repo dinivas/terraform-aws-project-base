@@ -20,6 +20,14 @@ variable "mgmt_subnet_cidr" {
   default = "10.10.11.0/24"
 }
 
+variable "mgmt_subnet_dhcp_allocation_start" {
+  type    = "string"
+}
+
+variable "mgmt_subnet_dhcp_allocation_end" {
+  type    = "string"
+}
+
 
 variable "bastion_ssh_user" {
   type        = "string"
@@ -43,6 +51,7 @@ variable "floating_ip_pool" {
   description = "Pool name to retrieve floating ip"
   default     = "public"
 }
+
 variable "bastion_existing_floating_ip_to_use" {
   type        = "string"
   description = "Available floating ip to associate to bastion host"
@@ -181,6 +190,12 @@ variable "project_consul_domain" {
 variable "project_consul_datacenter" {
   type        = "string"
   description = "The datacenter name for the consul cluster"
+}
+
+variable "project_consul_floating_ip_pool" {
+  type        = "string"
+  description = "Pool name to retrieve floating ip"
+  default     = ""
 }
 
 variable "project_consul_server_count" {

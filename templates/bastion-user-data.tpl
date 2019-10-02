@@ -4,7 +4,7 @@
 final_message: "Dinivas consul is ready after $UPTIME seconds, Happy DINIVAS!!!"
 runcmd:
   - [ sh, -c, /etc/configure-consul.sh]
-  - [ cat, /etc/consul/config.json]
+#  - [ cat, /etc/consul/config.json]
 write_files:
 -   content: |
         {

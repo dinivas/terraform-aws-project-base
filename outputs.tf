@@ -52,3 +52,19 @@ output "project_keypair_name" {
   value       = "${module.project_generated_keypair.name}"
   description = "Default keypair used for project hosts"
 }
+
+output "consul_server_instance_ids" {
+  value = "${module.project_consul_cluster.consul_server_instance_ids}"
+}
+
+output "consul_client_instance_ids" {
+  value = "${module.project_consul_cluster.consul_client_instance_ids}"
+}
+
+output "consul_server_network_fixed_ip_v4" {
+  value = "${module.project_consul_cluster.consul_server_network_fixed_ip_v4}"
+}
+
+output "consul_client_network_fixed_ip_v4" {
+  value = "${module.project_consul_cluster.consul_client_network_fixed_ip_v4}"
+}

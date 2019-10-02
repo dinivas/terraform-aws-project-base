@@ -10,7 +10,7 @@ module "project_consul_cluster" {
   consul_cluster_availability_zone            = "${var.project_availability_zone}"
   consul_cluster_network_id                   = "${module.mgmt_network.network_id}"
   consul_cluster_subnet_id                    = ["${module.mgmt_network.subnet_ids}"]
-  consul_cluster_floating_ip_pool             = "${var.floating_ip_pool}"
+  consul_cluster_floating_ip_pool             = "${var.project_consul_floating_ip_pool}"
   consul_server_instance_count                = "${var.project_consul_server_count}"
   consul_server_image_name                    = "${var.project_consul_server_image_name}"
   consul_server_flavor_name                   = "${var.project_consul_server_flavor_name}"

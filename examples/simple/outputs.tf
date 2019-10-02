@@ -38,3 +38,19 @@ output "project_mgmt_subnet_names" {
   value       = "${module.dinivas_project_base.mgmt_subnet_names}"
   description = "Project management network"
 }
+
+output "project_consul_server_instance_ids" {
+  value = "${module.dinivas_project_base.consul_server_instance_ids}"
+}
+
+output "project_consul_client_instance_ids" {
+  value = "${module.dinivas_project_base.consul_client_instance_ids}"
+}
+
+output "project_consul_server_network_fixed_ip_v4" {
+  value = "${module.dinivas_project_base.consul_server_network_fixed_ip_v4}"
+}
+
+output "project_consul_client_network_fixed_ip_v4" {
+  value = "${module.dinivas_project_base.consul_client_network_fixed_ip_v4}"
+}
