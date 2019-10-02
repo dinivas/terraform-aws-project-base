@@ -123,10 +123,7 @@ variable "prometheus_security_group_rules" {
 
 variable "metadata" {
   description = "A map of metadata to add to all resources supporting it."
-  default = {
-    prometheus_io_scrape = true,
-    prometheus_io_port   = 9100
-  }
+  default = {}
 }
 
 variable enable_proxy {

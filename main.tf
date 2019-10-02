@@ -151,13 +151,13 @@ module "bastion_compute" {
   flavor_name                   = "${var.bastion_compute_flavor_name}"
   keypair                       = "${module.bastion_generated_keypair.name}"
   network_ids                   = ["${module.mgmt_network.network_id}"]
-  subnet_ids                    = "${module.mgmt_network.subnet_ids}"
+  subnet_ids                    = ["${module.mgmt_network.subnet_ids}"]
   instance_security_group_name  = "${var.project_name}-bastion"
   instance_security_group_rules = "${var.bastion_security_group_rules}"
   security_groups_to_associate  = ["${module.common_security_group.name}"]
-  user_data                     = "${data.template_file.bastion_user_data.rendered}"
-  metadata                      = "${var.metadata}"
-  availability_zone             = "${var.project_availability_zone}"
+  #user_data                     = "${data.template_file.bastion_user_data.rendered}"
+  metadata          = "${merge(var.metadata, {"consul_cluster_name" = format("%s-%s", var.project_name, "-consul")})}"
+  availability_zone = "${var.project_availability_zone}"
 }
 
 

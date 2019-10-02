@@ -28,3 +28,13 @@ output "project_keypair" {
   value       = "${module.dinivas_project_base.project_keypair_name}"
   description = "Default keypair used for project hosts"
 }
+
+output "project_mgmt_network_names" {
+  value       = "${module.dinivas_project_base.mgmt_network_name}"
+  description = "Project management network"
+}
+
+output "project_mgmt_subnet_names" {
+  value       = "${module.dinivas_project_base.mgmt_subnet_names}"
+  description = "Project management network"
+}
