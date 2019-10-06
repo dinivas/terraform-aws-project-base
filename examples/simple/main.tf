@@ -2,14 +2,12 @@ variable "os_auth_domain_name" {
   type    = "string"
   default = "default"
 }
-
 variable "os_auth_username" {}
 
 variable "os_auth_password" {}
-
 variable "os_auth_url" {}
-
 variable "os_project_id" {}
+variable "project_keycloak_host" {}
 
 module "dinivas_project_base" {
   source = "../../"
@@ -39,7 +37,7 @@ module "dinivas_project_base" {
   project_consul_client_count     = 1
   project_consul_floating_ip_pool = ""
 
-  project_keycloak_host = "auth.dinivas.serveo.net"
+  project_keycloak_host          = "${var.project_keycloak_host}"
 
   os_auth_domain_name = "${var.os_auth_domain_name}"
   os_auth_username    = "${var.os_auth_username}"

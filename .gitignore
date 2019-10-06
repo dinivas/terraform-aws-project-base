@@ -31,4 +31,4 @@ Gemfile.lock
 **/.kitchen/*
 *.key
 
-examples/simple/providers.tf
+provider.tf
