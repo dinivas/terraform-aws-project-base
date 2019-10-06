@@ -9,6 +9,11 @@ variable "project_description" {
   default     = ""
 }
 
+variable "project_root_domain" {
+  type        = "string"
+  description = "The root Domain (DNS) used for this project"
+}
+
 variable "project_availability_zone" {
   type        = "string"
   description = "The project availability zone."
@@ -21,11 +26,11 @@ variable "mgmt_subnet_cidr" {
 }
 
 variable "mgmt_subnet_dhcp_allocation_start" {
-  type    = "string"
+  type = "string"
 }
 
 variable "mgmt_subnet_dhcp_allocation_end" {
-  type    = "string"
+  type = "string"
 }
 
 
@@ -132,7 +137,7 @@ variable "prometheus_security_group_rules" {
 
 variable "metadata" {
   description = "A map of metadata to add to all resources supporting it."
-  default = {}
+  default     = {}
 }
 
 variable enable_proxy {
@@ -229,6 +234,21 @@ variable "project_consul_client_flavor_name" {
   description = "The compute flavor name used for Consul client."
   default     = "dinivas.medium"
 }
+
+# Project Keycloak variables
+
+variable "project_keycloak_scheme" {
+  type    = "string"
+  description = "Used by application that need to connect to Keycloak"
+  default = "http"
+}
+
+variable "project_keycloak_host" {
+  type        = "string"
+  description = "Used by application that need to connect to Keycloak"
+}
+
+# Auth variables used by consul
 
 variable "os_auth_domain_name" {
   type    = "string"

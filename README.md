@@ -1,4 +1,4 @@
-# Dinivas Terraform bas project
+# Dinivas Terraform base project
 
 This module will create the project base archi for Dinivas
 

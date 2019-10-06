@@ -1,8 +1,34 @@
 # ******************************* Proxy setup ***********************************
 
+data "template_file" "proxy_user_data" {
+  count = "${var.enable_proxy}"
+
+  template = "${file("${path.module}/templates/proxy-user-data.tpl")}"
+
+  vars = {
+    project_root_domain            = "${var.project_root_domain}"
+    project_keycloak_scheme        = "${var.project_keycloak_scheme}"
+    project_keycloak_host          = "${var.project_keycloak_host}"
+    project_keycloak_realm         = "${keycloak_realm.project_realm.id}"
+    consul_agent_mode              = "client"
+    consul_cluster_domain          = "${var.project_consul_domain}"
+    consul_cluster_datacenter      = "${var.project_consul_datacenter}"
+    consul_cluster_name            = "${var.project_name}-consul"
+    keycloak_grafana_client_id     = "${keycloak_openid_client.grafana_client.client_id}"
+    keycloak_grafana_client_secret = "${keycloak_openid_client.grafana_client.client_secret}"
+    os_auth_domain_name            = "${var.os_auth_domain_name}"
+    os_auth_username               = "${var.os_auth_username}"
+    os_auth_password               = "${var.os_auth_password}"
+    os_auth_url                    = "${var.os_auth_url}"
+    os_project_id                  = "${var.os_project_id}"
+  }
+}
+
 module "proxy_compute" {
   #source = "../terraform-os-compute"
   source = "github.com/dinivas/terraform-openstack-instance"
+
+  enabled = "${var.enable_proxy}"
 
   instance_name                 = "${var.project_name}-proxy"
   image_name                    = "${var.proxy_image_name}"
@@ -13,8 +39,8 @@ module "proxy_compute" {
   instance_security_group_name  = "${var.project_name}-proxy-sg"
   instance_security_group_rules = "${var.proxy_security_group_rules}"
   security_groups_to_associate  = ["${module.common_security_group.name}"]
-  metadata                      = "${var.metadata}"
-  enabled                       = "${var.enable_proxy}"
+  user_data                     = "${data.template_file.proxy_user_data.0.rendered}"
+  metadata                      = "${merge(var.metadata, map("consul_cluster_name", format("%s-%s", var.project_name, "consul")))}"
   availability_zone             = "${var.project_availability_zone}"
 }
 

@@ -30,3 +30,5 @@ Gemfile.lock
 # Local test-kitchen files.
 **/.kitchen/*
 *.key
+
+examples/simple/providers.tf
