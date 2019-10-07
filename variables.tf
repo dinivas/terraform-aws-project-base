@@ -248,6 +248,31 @@ variable "project_keycloak_host" {
   description = "Used by application that need to connect to Keycloak"
 }
 
+variable "project_keycloak_initial_username" {
+  type        = "string"
+  description = "Username for the initial User created in project Keycloak"
+  default = "admin"
+}
+
+variable "project_keycloak_initial_user_password" {
+  type        = "string"
+  description = "Password for the initial User created in project Keycloak"
+  default = "admin"
+}
+
+variable "project_keycloak_initial_user_first_name" {
+  type        = "string"
+  description = "First name for the initial User created in project Keycloak"
+  default = "Admin"
+}
+
+variable "project_keycloak_initial_user_last_name" {
+  type        = "string"
+  description = "Last name for the initial User created in project Keycloak"
+  default = "Admin"
+}
+
+
 # Auth variables used by consul
 
 variable "os_auth_domain_name" {
