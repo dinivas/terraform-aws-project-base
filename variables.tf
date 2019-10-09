@@ -12,6 +12,7 @@ variable "project_description" {
 variable "project_root_domain" {
   type        = "string"
   description = "The root Domain (DNS) used for this project"
+  default     = ""
 }
 
 variable "project_availability_zone" {
@@ -170,6 +171,12 @@ variable "proxy_compute_flavor_name" {
   description = "The proxy compute flavor name."
 }
 
+variable "proxy_prefered_floating_ip" {
+  type        = "string"
+  description = "The existing floating ip to use for proxy host"
+  default     = ""
+}
+
 variable "prometheus_image_name" {
   type        = "string"
   description = "The prometheus compute image name."
@@ -238,9 +245,9 @@ variable "project_consul_client_flavor_name" {
 # Project Keycloak variables
 
 variable "project_keycloak_scheme" {
-  type    = "string"
+  type        = "string"
   description = "Used by application that need to connect to Keycloak"
-  default = "http"
+  default     = "http"
 }
 
 variable "project_keycloak_host" {
@@ -251,25 +258,25 @@ variable "project_keycloak_host" {
 variable "project_keycloak_initial_username" {
   type        = "string"
   description = "Username for the initial User created in project Keycloak"
-  default = "admin"
+  default     = "admin"
 }
 
 variable "project_keycloak_initial_user_password" {
   type        = "string"
   description = "Password for the initial User created in project Keycloak"
-  default = "admin"
+  default     = "admin"
 }
 
 variable "project_keycloak_initial_user_first_name" {
   type        = "string"
   description = "First name for the initial User created in project Keycloak"
-  default = "Admin"
+  default     = "Admin"
 }
 
 variable "project_keycloak_initial_user_last_name" {
   type        = "string"
   description = "Last name for the initial User created in project Keycloak"
-  default = "Admin"
+  default     = "Admin"
 }
 
 

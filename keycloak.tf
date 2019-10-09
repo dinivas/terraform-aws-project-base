@@ -15,7 +15,7 @@ resource "keycloak_user" "user_with_initial_password" {
 
   initial_password {
     value     = "${var.project_keycloak_initial_user_password}"
-    temporary = false
+    temporary = true
   }
 }
 

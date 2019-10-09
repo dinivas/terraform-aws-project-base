@@ -92,6 +92,7 @@ module "bastion_generated_keypair" {
 resource "local_file" "bastion_private_key" {
   content  = "${module.bastion_generated_keypair.private_key}"
   filename = "${var.bastion_private_key_output_directory != "" ? var.bastion_private_key_output_directory : path.cwd}/${var.project_name}-bastion.key"
+  file_permission = "0400"
 }
 
 module "project_generated_keypair" {

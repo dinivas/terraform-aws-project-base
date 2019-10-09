@@ -14,7 +14,7 @@ module "dinivas_project_base" {
 
   project_name                      = "dnv"
   project_description               = ""
-  project_root_domain               = "dinivas.remote"
+  project_root_domain               = "164.132.92.34.nip.io"
   project_availability_zone         = "nova:node03"
   public_router_name                = "router1"
   mgmt_subnet_cidr                  = "10.10.13.0/24"
@@ -29,6 +29,7 @@ module "dinivas_project_base" {
   enable_prometheus                 = "0"
   proxy_image_name                  = "Dinivas Proxy"
   proxy_compute_flavor_name         = "dinivas.large"
+  proxy_prefered_floating_ip        = "164.132.92.34"
 
   project_consul_enable           = "1"
   project_consul_domain           = "dinivas"
@@ -37,7 +38,7 @@ module "dinivas_project_base" {
   project_consul_client_count     = 1
   project_consul_floating_ip_pool = ""
 
-  project_keycloak_host          = "${var.project_keycloak_host}"
+  project_keycloak_host = "${var.project_keycloak_host}"
 
   os_auth_domain_name = "${var.os_auth_domain_name}"
   os_auth_username    = "${var.os_auth_username}"
