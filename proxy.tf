@@ -44,8 +44,14 @@ module "proxy_compute" {
   availability_zone             = "${var.project_availability_zone}"
 }
 
+data "openstack_networking_floatingip_v2" "proxy_floatingip" {
+  count = "${var.proxy_prefered_floating_ip != "" ? var.enable_proxy * 1 : 0}"
+
+  address = "${var.proxy_prefered_floating_ip}"
+}
+
 resource "openstack_networking_floatingip_v2" "proxy_floatingip" {
-  count = "${var.floating_ip_pool != "" ? var.enable_proxy * 1 : 0}"
+  count = "${var.floating_ip_pool != "" && var.proxy_prefered_floating_ip == "" ? var.enable_proxy * 1 : 0}"
 
   pool = "${var.floating_ip_pool}"
 }
@@ -53,7 +59,7 @@ resource "openstack_networking_floatingip_v2" "proxy_floatingip" {
 resource "openstack_compute_floatingip_associate_v2" "proxy_floatingip_associate" {
   count = "${var.enable_proxy}"
 
-  floating_ip           = "${openstack_networking_floatingip_v2.proxy_floatingip.0.address}"
+  floating_ip           = "${var.proxy_prefered_floating_ip != "" ? data.openstack_networking_floatingip_v2.proxy_floatingip.0.address : openstack_networking_floatingip_v2.proxy_floatingip.0.address}"
   instance_id           = "${module.proxy_compute.ids[0]}"
   fixed_ip              = "${module.proxy_compute.network_fixed_ip_v4[0]}"
   wait_until_associated = true
