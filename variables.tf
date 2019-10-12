@@ -302,3 +302,8 @@ variable "os_auth_url" {
 variable "os_project_id" {
   type = "string"
 }
+
+variable "generic_user_data_file_url" {
+  type    = "string"
+  default = "https://raw.githubusercontent.com/dinivas/terraform-openstack-shared/master/templates/generic-user-data.tpl"
+}

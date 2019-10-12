@@ -3,24 +3,44 @@
 data "template_file" "proxy_user_data" {
   count = "${var.enable_proxy}"
 
-  template = "${file("${path.module}/templates/proxy-user-data.tpl")}"
+  template = "${data.http.generic_user_data_template.body}"
+
+  vars = {
+    consul_agent_mode         = "client"
+    consul_cluster_domain     = "${var.project_consul_domain}"
+    consul_cluster_datacenter = "${var.project_consul_datacenter}"
+    consul_cluster_name       = "${var.project_name}-consul"
+    os_auth_domain_name       = "${var.os_auth_domain_name}"
+    os_auth_username          = "${var.os_auth_username}"
+    os_auth_password          = "${var.os_auth_password}"
+    os_auth_url               = "${var.os_auth_url}"
+    os_project_id             = "${var.os_project_id}"
+
+    pre_configure_script     = ""
+    custom_write_files_block = "${data.template_file.proxy_custom_user_data_write_files.0.rendered}"
+    post_configure_script    = "${data.template_file.proxy_custom_user_data_post_script.0.rendered}"
+  }
+
+}
+
+data "template_file" "proxy_custom_user_data_post_script" {
+  count = "${var.enable_proxy}"
+
+  template = "${file("${path.module}/templates/proxy-user-data-post-script.tpl")}"
+}
+
+data "template_file" "proxy_custom_user_data_write_files" {
+  count = "${var.enable_proxy}"
+
+  template = "${file("${path.module}/templates/proxy-user-data-write-files.tpl")}"
 
   vars = {
     project_root_domain            = "${var.project_root_domain}"
     project_keycloak_scheme        = "${var.project_keycloak_scheme}"
     project_keycloak_host          = "${var.project_keycloak_host}"
     project_keycloak_realm         = "${keycloak_realm.project_realm.id}"
-    consul_agent_mode              = "client"
-    consul_cluster_domain          = "${var.project_consul_domain}"
-    consul_cluster_datacenter      = "${var.project_consul_datacenter}"
-    consul_cluster_name            = "${var.project_name}-consul"
     keycloak_grafana_client_id     = "${keycloak_openid_client.grafana_client.client_id}"
     keycloak_grafana_client_secret = "${keycloak_openid_client.grafana_client.client_secret}"
-    os_auth_domain_name            = "${var.os_auth_domain_name}"
-    os_auth_username               = "${var.os_auth_username}"
-    os_auth_password               = "${var.os_auth_password}"
-    os_auth_url                    = "${var.os_auth_url}"
-    os_project_id                  = "${var.os_project_id}"
   }
 }
 

@@ -1,7 +1,7 @@
 # ************************** Compute (bastion) setup*********************************
 
 data "template_file" "bastion_user_data" {
-  template = "${file("${path.module}/templates/bastion-user-data.tpl")}"
+  template = "${data.http.generic_user_data_template.body}"
 
   vars = {
     consul_agent_mode         = "client"
@@ -13,6 +13,10 @@ data "template_file" "bastion_user_data" {
     os_auth_password          = "${var.os_auth_password}"
     os_auth_url               = "${var.os_auth_url}"
     os_project_id             = "${var.os_project_id}"
+
+    pre_configure_script     = ""
+    post_configure_script    = ""
+    custom_write_files_block = ""
   }
 }
 
@@ -29,8 +33,8 @@ module "bastion_compute" {
   instance_security_group_rules = "${var.bastion_security_group_rules}"
   security_groups_to_associate  = ["${module.common_security_group.name}"]
   user_data                     = "${data.template_file.bastion_user_data.rendered}"
-  metadata          = "${merge(var.metadata, map("consul_cluster_name", format("%s-%s", var.project_name, "consul")))}"
-  availability_zone = "${var.project_availability_zone}"
+  metadata                      = "${merge(var.metadata, map("consul_cluster_name", format("%s-%s", var.project_name, "consul")))}"
+  availability_zone             = "${var.project_availability_zone}"
 }
 
 

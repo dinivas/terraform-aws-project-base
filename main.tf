@@ -120,3 +120,7 @@ resource "openstack_networking_floatingip_v2" "bastion_floatingip" {
 locals {
   bastion_floating_ip = "${var.bastion_existing_floating_ip_to_use != "" ? data.openstack_networking_floatingip_v2.bastion_floatingip.0.address : openstack_networking_floatingip_v2.bastion_floatingip.0.address}"
 }
+
+data "http" "generic_user_data_template" {
+  url = "${var.generic_user_data_file_url}"
+}
