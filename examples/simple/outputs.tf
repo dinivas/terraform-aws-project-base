@@ -24,6 +24,11 @@ output "bastion_private_key_file" {
   description = "The private Key file(generated) to access bastion"
 }
 
+output "project_private_key" {
+  value       = "${module.dinivas_project_base.project_private_key}"
+  description = "The private Key to access project instances"
+}
+
 output "project_keypair" {
   value       = "${module.dinivas_project_base.project_keypair_name}"
   description = "Default keypair used for project hosts"

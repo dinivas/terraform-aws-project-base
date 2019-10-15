@@ -1,5 +1,5 @@
 output "bastion_instance_id" {
-  value       = "${module.bastion_compute.ids}"
+  value = "${openstack_compute_instance_v2.bastion.id}"
 }
 
 output "bastion_private_key" {
@@ -53,6 +53,12 @@ output "project_keypair_name" {
   description = "Default keypair used for project hosts"
 }
 
+output "project_private_key" {
+  value       = "${module.project_generated_keypair.private_key}"
+  description = "The private Key used for project"
+  sensitive   = true
+}
+
 output "consul_server_instance_ids" {
   value = "${module.project_consul_cluster.consul_server_instance_ids}"
 }
@@ -67,4 +73,13 @@ output "consul_server_network_fixed_ip_v4" {
 
 output "consul_client_network_fixed_ip_v4" {
   value = "${module.project_consul_cluster.consul_client_network_fixed_ip_v4}"
+}
+
+
+output "ssh_via_bastion_config" {
+  value = {
+    host_private_key    = "${module.project_generated_keypair.private_key}"
+    bastion_host        = "${local.bastion_floating_ip}"
+    bastion_private_key = "${module.bastion_generated_keypair.private_key}"
+  }
 }

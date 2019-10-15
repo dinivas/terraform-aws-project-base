@@ -31,7 +31,7 @@ module "dinivas_project_base" {
   proxy_compute_flavor_name         = "dinivas.large"
   proxy_prefered_floating_ip        = "164.132.92.35"
 
-  project_consul_enable           = "0"
+  project_consul_enable           = "1"
   project_consul_domain           = "dinivas.io"
   project_consul_datacenter       = "gra"
   project_consul_server_count     = 1

@@ -1,7 +1,7 @@
 # ******************************* Prometheus setup ***********************************
 
 module "prometheus_compute" {
-  #source = "../terraform-os-compute"
+  #source = "../terraform-openstack-instance"
   source = "github.com/dinivas/terraform-openstack-instance"
 
   instance_name                 = "${var.project_name}-prometheus"

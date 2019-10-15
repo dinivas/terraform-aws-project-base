@@ -1,7 +1,9 @@
 # Project default Consul definition
 
 module "project_consul_cluster" {
-  source = "github.com/dinivas/terraform-openstack-consul"
+  source = "../terraform-openstack-consul"
+
+  #source = "github.com/dinivas/terraform-openstack-consul"
 
   enable_consul_cluster                       = "${var.project_consul_enable}"
   consul_cluster_name                         = "${var.project_name}-consul"
@@ -22,7 +24,19 @@ module "project_consul_cluster" {
   consul_cluster_security_groups_to_associate = ["${var.project_name}-common"]
   consul_cluster_metadata = {
     consul_cluster_name = "${var.project_name}-consul"
+    project             = "${var.project_name}"
   }
+  execute_on_destroy_server_instance_script = ""
+  execute_on_destroy_client_instance_script = "consul leave"
+
+  ssh_via_bastion_config = {
+    host_private_key    = "${module.project_generated_keypair.private_key}"
+    bastion_host        = "${local.bastion_floating_ip}"
+    bastion_private_key = "${module.bastion_generated_keypair.private_key}"
+  }
+
+  consul_depends_on = ["${openstack_compute_instance_v2.bastion.id}", "${null_resource.provision_project_private_key_to_bastion.id}"]
+
   os_auth_domain_name = "${var.os_auth_domain_name}"
   os_auth_username    = "${var.os_auth_username}"
   os_auth_password    = "${var.os_auth_password}"

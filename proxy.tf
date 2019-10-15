@@ -45,8 +45,9 @@ data "template_file" "proxy_custom_user_data_write_files" {
 }
 
 module "proxy_compute" {
-  #source = "../terraform-os-compute"
-  source = "github.com/dinivas/terraform-openstack-instance"
+  source = "../terraform-openstack-instance"
+
+  #source = "github.com/dinivas/terraform-openstack-instance"
 
   enabled = "${var.enable_proxy}"
 
@@ -60,7 +61,7 @@ module "proxy_compute" {
   instance_security_group_rules = "${var.proxy_security_group_rules}"
   security_groups_to_associate  = ["${module.common_security_group.name}"]
   user_data                     = "${data.template_file.proxy_user_data.0.rendered}"
-  metadata                      = "${merge(var.metadata, map("consul_cluster_name", format("%s-%s", var.project_name, "consul")))}"
+  metadata                      = "${merge(var.metadata, map("consul_cluster_name", format("%s-%s", var.project_name, "consul")), map("project", var.project_name))}"
   availability_zone             = "${var.project_availability_zone}"
 }
 
