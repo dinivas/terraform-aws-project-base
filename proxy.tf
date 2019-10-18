@@ -63,6 +63,14 @@ module "proxy_compute" {
   user_data                     = "${data.template_file.proxy_user_data.0.rendered}"
   metadata                      = "${merge(var.metadata, map("consul_cluster_name", format("%s-%s", var.project_name, "consul")), map("project", var.project_name))}"
   availability_zone             = "${var.project_availability_zone}"
+
+  execute_on_destroy_instance_script = "consul leave"
+
+  ssh_via_bastion_config = {
+    host_private_key    = "${module.project_generated_keypair.private_key}"
+    bastion_host        = "${local.bastion_floating_ip}"
+    bastion_private_key = "${module.bastion_generated_keypair.private_key}"
+  }
 }
 
 data "openstack_networking_floatingip_v2" "proxy_floatingip" {

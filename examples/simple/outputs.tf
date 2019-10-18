@@ -27,6 +27,7 @@ output "bastion_private_key_file" {
 output "project_private_key" {
   value       = "${module.dinivas_project_base.project_private_key}"
   description = "The private Key to access project instances"
+  sensitive   = true
 }
 
 output "project_keypair" {
@@ -50,12 +51,4 @@ output "project_consul_server_instance_ids" {
 
 output "project_consul_client_instance_ids" {
   value = "${module.dinivas_project_base.consul_client_instance_ids}"
-}
-
-output "project_consul_server_network_fixed_ip_v4" {
-  value = "${module.dinivas_project_base.consul_server_network_fixed_ip_v4}"
-}
-
-output "project_consul_client_network_fixed_ip_v4" {
-  value = "${module.dinivas_project_base.consul_client_network_fixed_ip_v4}"
 }

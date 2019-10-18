@@ -60,21 +60,12 @@ output "project_private_key" {
 }
 
 output "consul_server_instance_ids" {
-  value = "${module.project_consul_cluster.consul_server_instance_ids}"
+  value = "${openstack_compute_instance_v2.consul_server.*.id}"
 }
 
 output "consul_client_instance_ids" {
-  value = "${module.project_consul_cluster.consul_client_instance_ids}"
+  value = "${openstack_compute_instance_v2.consul_client.*.id}"
 }
-
-output "consul_server_network_fixed_ip_v4" {
-  value = "${module.project_consul_cluster.consul_server_network_fixed_ip_v4}"
-}
-
-output "consul_client_network_fixed_ip_v4" {
-  value = "${module.project_consul_cluster.consul_client_network_fixed_ip_v4}"
-}
-
 
 output "ssh_via_bastion_config" {
   value = {

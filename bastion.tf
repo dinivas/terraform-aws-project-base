@@ -39,6 +39,8 @@ resource "openstack_networking_secgroup_rule_v2" "this" {
 
 resource "openstack_compute_instance_v2" "bastion" {
 
+  depends_on = ["module.mgmt_network.subnet_ids"]
+
   name            = "${var.project_name}-bastion"
   image_name      = "${var.bastion_image_name}"
   flavor_name     = "${var.bastion_compute_flavor_name}"
