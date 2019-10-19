@@ -25,7 +25,7 @@ resource "openstack_networking_secgroup_v2" "bastion" {
   description = "${format("%s project Bastion security group", var.project_name)}"
 }
 
-resource "openstack_networking_secgroup_rule_v2" "this" {
+resource "openstack_networking_secgroup_rule_v2" "bastion" {
   count = "${length(var.bastion_security_group_rules)}"
 
   port_range_min    = "${lookup(var.bastion_security_group_rules[count.index], "port_range_min", 0)}"

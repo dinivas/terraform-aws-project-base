@@ -44,7 +44,7 @@ output "bastion_floating_ip" {
 }
 
 output "proxy_floating_ip" {
-  value       = "${openstack_networking_floatingip_v2.proxy_floatingip.0.address}"
+  value       = "${var.proxy_prefered_floating_ip != "" ? data.openstack_networking_floatingip_v2.proxy_floatingip.0.address : openstack_networking_floatingip_v2.proxy_floatingip.0.address}"
   description = "The floating ip bind to proxy"
 }
 

@@ -38,11 +38,11 @@ resource "openstack_networking_secgroup_v2" "consul_server" {
 resource "openstack_compute_instance_v2" "consul_server" {
   count = "${var.project_consul_server_count * var.project_consul_enable}"
 
-  depends_on = ["openstack_compute_instance_v2.bastion"]
+  depends_on = ["openstack_compute_instance_v2.bastion", "openstack_compute_floatingip_associate_v2.bastion_floatingip_associate"]
 
   name                = "${format("%s-%s-%s", var.project_name, "consul-server", count.index)}"
   image_name          = "${var.project_consul_server_image_name}"
-  flavor_name           = "${var.project_consul_server_flavor_name}"
+  flavor_name         = "${var.project_consul_server_flavor_name}"
   key_pair            = "${var.project_name}"
   security_groups     = ["${openstack_networking_secgroup_v2.consul_server.name}", "${format("%s-common", var.project_name)}"]
   stop_before_destroy = true
@@ -110,11 +110,11 @@ resource "openstack_networking_secgroup_v2" "consul_client" {
 resource "openstack_compute_instance_v2" "consul_client" {
   count = "${var.project_consul_client_count * var.project_consul_enable}"
 
-  depends_on = ["openstack_compute_instance_v2.bastion"]
+  depends_on = ["openstack_compute_instance_v2.bastion", "openstack_compute_floatingip_associate_v2.bastion_floatingip_associate"]
 
   name                = "${format("%s-%s-%s", var.project_name, "consul-client", count.index)}"
   image_name          = "${var.project_consul_client_image_name}"
-  flavor_name           = "${var.project_consul_client_flavor_name}"
+  flavor_name         = "${var.project_consul_client_flavor_name}"
   key_pair            = "${var.project_name}"
   security_groups     = ["${openstack_networking_secgroup_v2.consul_client.name}", "${format("%s-common", var.project_name)}"]
   stop_before_destroy = true

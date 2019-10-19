@@ -44,33 +44,38 @@ data "template_file" "proxy_custom_user_data_write_files" {
   }
 }
 
-module "proxy_compute" {
-  source = "../terraform-openstack-instance"
+resource "openstack_networking_secgroup_v2" "proxy" {
+  name        = "${var.project_name}-proxy-sg"
+  description = "${format("%s project Proxy security group", var.project_name)}"
+}
 
-  #source = "github.com/dinivas/terraform-openstack-instance"
+resource "openstack_networking_secgroup_rule_v2" "proxy" {
+  count = "${length(var.proxy_security_group_rules)}"
 
-  enabled = "${var.enable_proxy}"
+  port_range_min    = "${lookup(var.proxy_security_group_rules[count.index], "port_range_min", 0)}"
+  port_range_max    = "${lookup(var.proxy_security_group_rules[count.index], "port_range_max", 0)}"
+  protocol          = "${lookup(var.proxy_security_group_rules[count.index], "protocol")}"
+  direction         = "${lookup(var.proxy_security_group_rules[count.index], "direction")}"
+  ethertype         = "${lookup(var.proxy_security_group_rules[count.index], "ethertype")}"
+  remote_ip_prefix  = "${lookup(var.proxy_security_group_rules[count.index], "remote_ip_prefix", "")}"
+  security_group_id = "${openstack_networking_secgroup_v2.proxy.id}"
+}
 
-  instance_name                 = "${var.project_name}-proxy"
-  image_name                    = "${var.proxy_image_name}"
-  flavor_name                   = "${var.proxy_compute_flavor_name}"
-  keypair                       = "${module.project_generated_keypair.name}"
-  network_ids                   = ["${module.mgmt_network.network_id}"]
-  subnet_ids                    = ["${module.mgmt_network.subnet_ids}"]
-  instance_security_group_name  = "${var.project_name}-proxy-sg"
-  instance_security_group_rules = "${var.proxy_security_group_rules}"
-  security_groups_to_associate  = ["${module.common_security_group.name}"]
-  user_data                     = "${data.template_file.proxy_user_data.0.rendered}"
-  metadata                      = "${merge(var.metadata, map("consul_cluster_name", format("%s-%s", var.project_name, "consul")), map("project", var.project_name))}"
-  availability_zone             = "${var.project_availability_zone}"
+resource "openstack_compute_instance_v2" "proxy" {
 
-  execute_on_destroy_instance_script = "consul leave"
+  depends_on = ["module.mgmt_network.subnet_ids"]
 
-  ssh_via_bastion_config = {
-    host_private_key    = "${module.project_generated_keypair.private_key}"
-    bastion_host        = "${local.bastion_floating_ip}"
-    bastion_private_key = "${module.bastion_generated_keypair.private_key}"
+  name            = "${var.project_name}-proxy"
+  image_name      = "${var.proxy_image_name}"
+  flavor_name     = "${var.proxy_compute_flavor_name}"
+  key_pair        = "${module.project_generated_keypair.name}"
+  user_data       = "${data.template_file.proxy_user_data.0.rendered}"
+  security_groups = ["${module.common_security_group.name}", "${openstack_networking_secgroup_v2.proxy.name}"]
+  metadata        = "${merge(var.metadata, map("consul_cluster_name", format("%s-%s", var.project_name, "consul")), map("project", var.project_name))}"
+  network {
+    name = "${var.project_name}-mgmt"
   }
+  availability_zone = "${var.project_availability_zone}"
 }
 
 data "openstack_networking_floatingip_v2" "proxy_floatingip" {
@@ -89,7 +94,7 @@ resource "openstack_compute_floatingip_associate_v2" "proxy_floatingip_associate
   count = "${var.enable_proxy}"
 
   floating_ip           = "${var.proxy_prefered_floating_ip != "" ? data.openstack_networking_floatingip_v2.proxy_floatingip.0.address : openstack_networking_floatingip_v2.proxy_floatingip.0.address}"
-  instance_id           = "${module.proxy_compute.ids[0]}"
-  fixed_ip              = "${module.proxy_compute.network_fixed_ip_v4[0]}"
+  instance_id           = "${openstack_compute_instance_v2.proxy.id}"
+  fixed_ip              = "${openstack_compute_instance_v2.proxy.network.0.fixed_ip_v4}"
   wait_until_associated = true
 }
