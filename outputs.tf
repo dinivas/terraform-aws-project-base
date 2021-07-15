@@ -58,4 +58,5 @@ output "ssh_via_bastion_config" {
     bastion_host        = local.bastion_floating_ip
     bastion_private_key = tls_private_key.bastion.private_key_pem
   }
+  sensitive   = true
 }

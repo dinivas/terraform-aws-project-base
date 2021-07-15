@@ -170,13 +170,13 @@ variable "enable_logging_graylog" {
 variable "graylog_compute_image_name" {
   type        = string
   description = "The Graylog compute image name"
-  default     = ""
+  default     = "87912224"
 }
 
 variable "graylog_compute_flavour_name" {
   type        = string
   description = "The Graylog compute flavor name"
-  default     = ""
+  default     = "s-2vcpu-4gb"
 }
 
 variable "enable_logging_kibana" {
