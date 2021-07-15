@@ -21,8 +21,8 @@ data "template_file" "bastion_user_data" {
 }
 
 module "bastion_firewall_rules" {
-  source = "../terraform-digitalocean-firewall"
-  #source               = "github.com/dinivas/terraform-digitalocean-firewall"
+  #source = "../terraform-digitalocean-firewall"
+  source        = "github.com/dinivas/terraform-digitalocean-firewall"
   name          = "${var.project_name}-common"
   inbound_rules = var.bastion_firewall_inbound_rules
 }
