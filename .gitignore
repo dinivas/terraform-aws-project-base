@@ -32,3 +32,8 @@ Gemfile.lock
 *.key
 
 provider.tf
+*.hcl
+
+*.pub
+
+examples/simple/last-plan

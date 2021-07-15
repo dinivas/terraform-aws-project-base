@@ -3,15 +3,10 @@ output "bastion_floating_ip" {
   value       = "${module.dinivas_project_base.bastion_floating_ip}"
 }
 
-output "proxy_floating_ip" {
-  description = "The floating ip bind to proxy"
-  value       = "${module.dinivas_project_base.proxy_floating_ip}"
-}
-
-output "project_router_id" {
-  description = "The project router id"
-  value       = "${module.dinivas_project_base.project_router_id}"
-}
+# output "proxy_floating_ip" {
+#   description = "The floating ip bind to proxy"
+#   value       = "${module.dinivas_project_base.proxy_floating_ip}"
+# }
 
 output "bastion_private_key" {
   value       = "${module.dinivas_project_base.bastion_private_key}"
@@ -35,20 +30,15 @@ output "project_keypair" {
   description = "Default keypair used for project hosts"
 }
 
-output "project_mgmt_network_names" {
+output "project_mgmt_network_name" {
   value       = "${module.dinivas_project_base.mgmt_network_name}"
   description = "Project management network"
 }
 
-output "project_mgmt_subnet_names" {
-  value       = "${module.dinivas_project_base.mgmt_subnet_names}"
-  description = "Project management network"
-}
+# output "project_consul_server_instance_ids" {
+#   value = "${module.dinivas_project_base.consul_server_instance_ids}"
+# }
 
-output "project_consul_server_instance_ids" {
-  value = "${module.dinivas_project_base.consul_server_instance_ids}"
-}
-
-output "project_consul_client_instance_ids" {
-  value = "${module.dinivas_project_base.consul_client_instance_ids}"
-}
+# output "project_consul_client_instance_ids" {
+#   value = "${module.dinivas_project_base.consul_client_instance_ids}"
+# }

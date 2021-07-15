@@ -2,19 +2,19 @@
 
 # Consul servers definitions
 data "template_file" "consul_server_user_data" {
-  template = "${data.http.generic_user_data_template.body}"
+  template = data.http.generic_user_data_template.body
 
   vars = {
+    cloud_provider            = "digitalocean"
+    project_name              = var.project_name
     consul_agent_mode         = "server"
     consul_server_count       = "${var.project_consul_server_count}"
     consul_cluster_domain     = "${var.project_consul_domain}"
     consul_cluster_datacenter = "${var.project_consul_datacenter}"
     consul_cluster_name       = "${var.project_name}-consul"
-    os_auth_domain_name       = "${var.os_auth_domain_name}"
-    os_auth_username          = "${var.os_auth_username}"
-    os_auth_password          = "${var.os_auth_password}"
-    os_auth_url               = "${var.os_auth_url}"
-    os_project_id             = "${var.os_project_id}"
+    do_region                 = var.project_availability_zone
+    do_api_token              = var.do_api_token
+    enable_logging_graylog    = var.enable_logging_graylog
 
     pre_configure_script     = ""
     custom_write_files_block = "${data.template_file.consul_server_user_data_write_files.rendered}"
@@ -23,78 +23,59 @@ data "template_file" "consul_server_user_data" {
 }
 
 data "template_file" "consul_server_user_data_write_files" {
-  template = "${file("${path.module}/templates/consul-server-user-data.tpl")}"
+  template = file("${path.module}/templates/consul-server-user-data.tpl")
 
   vars = {
     consul_cluster_name = "${var.project_name}-consul"
   }
 }
 
-resource "openstack_networking_secgroup_v2" "consul_server" {
-  name        = "${format("%s-%s", var.project_name, "consul-server")}"
-  description = "${format("Shared Consul server security group on project %s", var.project_name)}"
-}
+resource "digitalocean_droplet" "consul_server" {
+  count = var.project_consul_server_count * var.project_consul_enable
 
-resource "openstack_compute_instance_v2" "consul_server" {
-  count = "${var.project_consul_server_count * var.project_consul_enable}"
+  depends_on = [digitalocean_droplet.bastion, digitalocean_floating_ip_assignment.bastion_floatingip_associate]
 
-  depends_on = ["openstack_compute_instance_v2.bastion", "openstack_compute_floatingip_associate_v2.bastion_floatingip_associate"]
+  name               = format("%s-%s-%s", var.project_name, "consul-server", count.index)
+  image              = var.project_consul_server_image_name
+  size               = var.project_consul_server_flavor_name
+  ssh_keys           = [module.project_ssh_key.id]
+  region             = var.project_availability_zone
+  vpc_uuid           = module.mgmt_network.vpc_id
+  user_data          = data.template_file.consul_server_user_data.rendered
+  tags               = concat([digitalocean_tag.project.name], split(",", format("consul_cluster_name_%s-%s,project_%s", var.project_name, "consul", var.project_name)))
+  private_networking = true
 
-  name                = "${format("%s-%s-%s", var.project_name, "consul-server", count.index)}"
-  image_name          = "${var.project_consul_server_image_name}"
-  flavor_name         = "${var.project_consul_server_flavor_name}"
-  key_pair            = "${var.project_name}"
-  security_groups     = ["${openstack_networking_secgroup_v2.consul_server.name}", "${format("%s-common", var.project_name)}"]
-  stop_before_destroy = true
-
-  dynamic "network" {
-    for_each = [module.mgmt_network.network_id]
-
-    content {
-      uuid = network.value
-    }
-  }
-
-  metadata = {
-    consul_cluster_name = "${var.project_name}-consul"
-    project             = "${var.project_name}"
-  }
-  user_data = "${data.template_file.consul_server_user_data.rendered}"
-
-  availability_zone = "${var.project_availability_zone}"
 }
 
 // Conditional floating ip on the first Consul server
-resource "openstack_networking_floatingip_v2" "consul_cluster_floatingip" {
-  count = "${var.project_consul_floating_ip_pool != "" ? var.project_consul_enable * 1 : 0}"
+resource "digitalocean_floating_ip" "consul_cluster_floatingip" {
+  count = var.project_consul_floating_ip_pool != "" ? var.project_consul_enable * 1 : 0
 
-  pool = "${var.project_consul_floating_ip_pool}"
+  region = var.project_availability_zone
 }
 
-resource "openstack_compute_floatingip_associate_v2" "consul_cluster_floatingip_associate" {
-  count = "${var.project_consul_floating_ip_pool != "" ? var.project_consul_enable * 1 : 0}"
+resource "digitalocean_floating_ip_assignment" "consul_cluster_floatingip_associate" {
+  count = var.project_consul_floating_ip_pool != "" ? var.project_consul_enable * 1 : 0
 
-  floating_ip           = "${lookup(openstack_networking_floatingip_v2.consul_cluster_floatingip[count.index], "address")}"
-  instance_id           = "${lookup(openstack_compute_instance_v2.consul_server[count.index], "id")}"
-  fixed_ip              = "${lookup(openstack_compute_instance_v2.consul_server[count.index].network.0, "fixed_ip_v4")}"
-  wait_until_associated = true
+  ip_address = digitalocean_floating_ip.consul_cluster_floatingip[count.index].ip_address
+  droplet_id = digitalocean_droplet.consul_server[count.index].id
 }
 
 # Consul client definitions
 
 data "template_file" "consul_client_user_data" {
-  template = "${data.http.generic_user_data_template.body}"
+  template = data.http.generic_user_data_template.body
 
   vars = {
+    cloud_provider            = "digitalocean"
+    project_name              = var.project_name
     consul_agent_mode         = "client"
     consul_cluster_domain     = "${var.project_consul_domain}"
     consul_cluster_datacenter = "${var.project_consul_datacenter}"
     consul_cluster_name       = "${var.project_name}-consul"
-    os_auth_domain_name       = "${var.os_auth_domain_name}"
-    os_auth_username          = "${var.os_auth_username}"
-    os_auth_password          = "${var.os_auth_password}"
-    os_auth_url               = "${var.os_auth_url}"
-    os_project_id             = "${var.os_project_id}"
+    do_region                 = var.project_availability_zone
+    do_api_token              = var.do_api_token
+    enable_logging_graylog    = var.enable_logging_graylog
 
     pre_configure_script     = ""
     custom_write_files_block = ""
@@ -102,58 +83,53 @@ data "template_file" "consul_client_user_data" {
   }
 }
 
-resource "openstack_networking_secgroup_v2" "consul_client" {
-  name        = "${format("%s-%s", var.project_name, "consul-client")}"
-  description = "${format("Shared Consul client security group on project %s", var.project_name)}"
+resource "digitalocean_droplet" "consul_client" {
+  count = var.project_consul_client_count * var.project_consul_enable
+
+  depends_on = [digitalocean_droplet.bastion, digitalocean_floating_ip_assignment.bastion_floatingip_associate]
+
+  name               = format("%s-%s-%s", var.project_name, "consul-client", count.index)
+  image              = var.project_consul_client_image_name
+  size               = var.project_consul_client_flavor_name
+  ssh_keys           = [module.project_ssh_key.id]
+  region             = var.project_availability_zone
+  vpc_uuid           = module.mgmt_network.vpc_id
+  user_data          = data.template_file.consul_client_user_data.rendered
+  tags               = concat([digitalocean_tag.project.name], split(",", format("consul_cluster_name_%s-%s,project_%s", var.project_name, "consul", var.project_name)))
+  private_networking = true
+
 }
 
-resource "openstack_compute_instance_v2" "consul_client" {
-  count = "${var.project_consul_client_count * var.project_consul_enable}"
+resource "null_resource" "consul_client_leave" {
+  count = var.project_consul_client_count * var.project_consul_enable
 
-  depends_on = ["openstack_compute_instance_v2.bastion", "openstack_compute_floatingip_associate_v2.bastion_floatingip_associate"]
-
-  name                = "${format("%s-%s-%s", var.project_name, "consul-client", count.index)}"
-  image_name          = "${var.project_consul_client_image_name}"
-  flavor_name         = "${var.project_consul_client_flavor_name}"
-  key_pair            = "${var.project_name}"
-  security_groups     = ["${openstack_networking_secgroup_v2.consul_client.name}", "${format("%s-common", var.project_name)}"]
-  stop_before_destroy = true
-
-  dynamic "network" {
-    for_each = [module.mgmt_network.network_id]
-
-    content {
-      uuid = network.value
-    }
+  triggers = {
+    bastion_private_key       = tls_private_key.bastion.private_key_pem
+    consul_client_private_key = tls_private_key.project.private_key_pem
+    bastion_floating_ip       = local.bastion_floating_ip
+    private_ip                = digitalocean_droplet.consul_client[count.index].ipv4_address_private
+    bastion_ssh_user          = var.bastion_ssh_user
   }
-
-  metadata = {
-    consul_cluster_name = "${var.project_name}-consul"
-    project             = "${var.project_name}"
-  }
-  user_data = "${data.template_file.consul_client_user_data.rendered}"
-
-  availability_zone = "${var.project_availability_zone}"
 
   connection {
     type        = "ssh"
-    user        = "centos"
+    user        = "root"
     port        = 22
-    host        = "${self.access_ip_v4}"
-    private_key = "${module.project_generated_keypair.private_key}"
+    host        = self.triggers.private_ip
+    private_key = self.triggers.consul_client_private_key
     agent       = false
 
-    bastion_host        = "${local.bastion_floating_ip}"
-    bastion_port        = 22
-    bastion_user        = "centos"
-    bastion_private_key = "${module.bastion_generated_keypair.private_key}"
+    bastion_host        = self.triggers.bastion_floating_ip
+    bastion_user        = self.triggers.bastion_ssh_user
+    bastion_private_key = self.triggers.bastion_private_key
   }
 
   provisioner "remote-exec" {
-    when = "destroy"
+    when = destroy
     inline = [
       "consul leave",
     ]
-    on_failure = "continue"
+    on_failure = continue
   }
+
 }
