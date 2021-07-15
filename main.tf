@@ -5,8 +5,8 @@ resource "digitalocean_tag" "project" {
 
 ## Management network
 module "mgmt_network" {
-  source = "../terraform-digitalocean-network/"
-  #source              = "github.com/dinivas/terraform-openstack-network"
+  #source = "../terraform-digitalocean-network/"
+  source              = "github.com/dinivas/terraform-digitalocean-network"
   vpc_name        = "${var.project_name}-mgmt"
   vpc_description = var.project_description
   vpc_ip_range    = var.mgmt_subnet_cidr
@@ -69,15 +69,15 @@ resource "local_file" "project_public_key" {
 }
 
 module "bastion_ssh_key" {
-  source = "../terraform-digitalocean-keypair"
-  #source           = "github.com/dinivas/terraform-openstack-keypair"
+  #source = "../terraform-digitalocean-keypair"
+  source           = "github.com/dinivas/terraform-digitalocean-keypair"
   name       = "${var.project_name}-bastion-keypair"
   public_key = tls_private_key.bastion.public_key_openssh
 }
 
 module "project_ssh_key" {
-  source = "../terraform-digitalocean-keypair"
-  #source           = "github.com/dinivas/terraform-openstack-keypair"
+  #source = "../terraform-digitalocean-keypair"
+  source           = "github.com/dinivas/terraform-digitalocean-keypair"
   name       = "${var.project_name}-project-keypair"
   public_key = tls_private_key.project.public_key_openssh
 }

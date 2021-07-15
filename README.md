@@ -1,4 +1,4 @@
-# Dinivas Terraform base project
+# Dinivas Digital Ocean Terraform base project
 
 This module will create the project base archi for Dinivas
 
