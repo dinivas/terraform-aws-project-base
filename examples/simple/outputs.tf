@@ -14,11 +14,6 @@ output "bastion_private_key" {
   sensitive   = true
 }
 
-output "bastion_private_key_file" {
-  value       = "${module.dinivas_project_base.bastion_private_key_file}"
-  description = "The private Key file(generated) to access bastion"
-}
-
 output "project_private_key" {
   value       = "${module.dinivas_project_base.project_private_key}"
   description = "The private Key to access project instances"

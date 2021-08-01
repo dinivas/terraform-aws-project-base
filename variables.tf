@@ -45,11 +45,6 @@ variable "bastion_private_key_output_directory" {
   description = "The directory where the Bastion private key will be generated."
   default     = ""
 }
-variable "project_private_key_output_directory" {
-  type        = string
-  description = "The directory where the Project private key will be generated."
-  default     = ""
-}
 
 variable "external_network" {
   type        = string

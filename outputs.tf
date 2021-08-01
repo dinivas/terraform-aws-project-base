@@ -8,11 +8,6 @@ output "bastion_private_key" {
   sensitive   = true
 }
 
-output "bastion_private_key_file" {
-  value       = local_file.bastion_private_key.filename
-  description = "The private Key file (generated) to access bastion"
-}
-
 output "project_private_key" {
   value       = tls_private_key.project.private_key_pem
   description = "The generated private Key to access project instance"

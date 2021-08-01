@@ -36,4 +36,5 @@ provider.tf
 
 *.pub
 
-examples/simple/last-plan
+last-plan
+tfplan

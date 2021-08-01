@@ -39,35 +39,6 @@ resource "tls_private_key" "project" {
   algorithm = "RSA"
 }
 
-locals {
-  bastion_private_key_filename = "${var.bastion_private_key_output_directory != "" ? var.bastion_private_key_output_directory : path.cwd}/${var.project_name}-bastion.key"
-  bastion_public_key_filename  = "${var.bastion_private_key_output_directory != "" ? var.bastion_private_key_output_directory : path.cwd}/${var.project_name}-bastion.pub"
-  project_private_key_filename = "${var.project_private_key_output_directory != "" ? var.project_private_key_output_directory : path.cwd}/${var.project_name}-project.key"
-  project_public_key_filename  = "${var.project_private_key_output_directory != "" ? var.project_private_key_output_directory : path.cwd}/${var.project_name}-project.pub"
-}
-
-resource "local_file" "bastion_private_key" {
-  content  = tls_private_key.bastion.private_key_pem
-  filename = local.bastion_private_key_filename
-  #file_permission = "0400"
-}
-resource "local_file" "bastion_public_key" {
-  content  = tls_private_key.bastion.public_key_openssh
-  filename = local.bastion_public_key_filename
-  #file_permission = "0400"
-}
-
-resource "local_file" "project_private_key" {
-  content  = tls_private_key.project.private_key_pem
-  filename = local.project_private_key_filename
-  #file_permission = "0400"
-}
-resource "local_file" "project_public_key" {
-  content  = tls_private_key.project.public_key_openssh
-  filename = local.project_public_key_filename
-  #file_permission = "0400"
-}
-
 module "bastion_ssh_key" {
   #source = "../terraform-digitalocean-keypair"
   source           = "github.com/dinivas/terraform-digitalocean-keypair"
