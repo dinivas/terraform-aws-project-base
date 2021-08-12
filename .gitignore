@@ -38,3 +38,5 @@ provider.tf
 
 last-plan
 tfplan
+
+examples/demo/

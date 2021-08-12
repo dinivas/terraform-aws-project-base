@@ -6,14 +6,15 @@ data "template_file" "graylog_user_data" {
   template = data.http.generic_user_data_template.body
 
   vars = {
-    cloud_provider            = "digitalocean"
+    cloud_provider            = "aws"
     project_name              = var.project_name
     consul_agent_mode         = "client"
     consul_cluster_domain     = var.project_consul_domain
     consul_cluster_datacenter = var.project_consul_datacenter
     consul_cluster_name       = "${var.project_name}-consul"
-    do_region                 = var.project_availability_zone
-    do_api_token              = var.do_api_token
+    aws_region                = var.aws_region
+    aws_access_key_id         = var.aws_access_key_id
+    aws_secret_access_key     = var.aws_secret_access_key
     enable_logging_graylog    = var.enable_logging_graylog
 
     pre_configure_script     = ""
@@ -63,16 +64,19 @@ data "template_file" "graylog_custom_user_data_write_files" {
 #   security_group_id = openstack_networking_secgroup_v2.graylog.id
 # }
 
-resource "digitalocean_droplet" "graylog" {
+resource "aws_instance" "graylog" {
   count = var.enable_logging_graylog
 
-  name               = "${var.project_name}-graylog"
-  image              = var.graylog_compute_image_name
-  size               = var.graylog_compute_flavour_name
-  ssh_keys           = [module.project_ssh_key.id]
-  region             = var.project_availability_zone
-  vpc_uuid           = module.mgmt_network.vpc_id
-  user_data          = data.template_file.graylog_user_data.0.rendered
-  tags               = concat([digitalocean_tag.project.name], split(",", format("consul_cluster_name_%s-%s,project_%s", var.project_name, "consul", var.project_name)))
-  private_networking = true
+  ami               = var.graylog_compute_image_name
+  instance_type     = var.graylog_compute_flavour_name
+  key_name          = aws_key_pair.project_ssh_key.key_name
+  availability_zone = var.project_availability_zone
+  user_data         = data.template_file.graylog_user_data.0.rendered
+
+  vpc_security_group_ids = [aws_security_group.private_subnet.id]
+
+  subnet_id = aws_subnet.private.id
+  tags = {
+    Name = format("%s-%s", var.project_name, "graylog")
+  }
 }

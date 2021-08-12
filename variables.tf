@@ -23,7 +23,15 @@ variable "project_availability_zone" {
 
 variable "mgmt_subnet_cidr" {
   type    = string
+  default = "10.0.0.0/16"
+}
+variable "mgmt_private_subnet_cidr" {
+  type    = string
   default = "10.10.11.0/24"
+}
+variable "mgmt_public_subnet_cidr" {
+  type    = string
+  default = "10.10.13.0/24"
 }
 
 variable "mgmt_subnet_dhcp_allocation_start" {
@@ -38,6 +46,11 @@ variable "mgmt_subnet_dhcp_allocation_end" {
 variable "bastion_ssh_user" {
   type        = string
   description = "The user to use for provisioning over SSH."
+}
+variable "bastion_ssh_key_name" {
+  type        = string
+  description = "The existing key_pair name."
+  default     = "value"
 }
 
 variable "bastion_private_key_output_directory" {
@@ -300,7 +313,13 @@ variable "project_keycloak_initial_user_last_name" {
 
 # Auth variables used by consul
 
-variable "do_api_token" {
+variable "aws_region" {
+  type = string
+}
+variable "aws_access_key_id" {
+  type = string
+}
+variable "aws_secret_access_key" {
   type = string
 }
 

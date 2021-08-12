@@ -6,14 +6,15 @@ data "template_file" "proxy_user_data" {
   template = data.http.generic_user_data_template.body
 
   vars = {
-    cloud_provider            = "digitalocean"
+    cloud_provider            = "aws"
     project_name              = var.project_name
     consul_agent_mode         = "client"
     consul_cluster_domain     = var.project_consul_domain
     consul_cluster_datacenter = var.project_consul_datacenter
     consul_cluster_name       = "${var.project_name}-consul"
-    do_region                 = var.project_availability_zone
-    do_api_token              = var.do_api_token
+    aws_region                = var.aws_region
+    aws_access_key_id         = var.aws_access_key_id
+    aws_secret_access_key     = var.aws_secret_access_key
     enable_logging_graylog    = var.enable_logging_graylog
 
     pre_configure_script     = ""
@@ -61,34 +62,38 @@ data "template_file" "proxy_custom_user_data_write_files" {
 #   security_group_id = openstack_networking_secgroup_v2.proxy.id
 # }
 
-resource "digitalocean_droplet" "proxy" {
 
-  name               = "${var.project_name}-proxy"
-  image              = var.proxy_image_name
-  size               = var.proxy_compute_flavor_name
-  ssh_keys           = [module.project_ssh_key.id]
-  region             = var.project_availability_zone
-  vpc_uuid           = module.mgmt_network.vpc_id
-  user_data          = data.template_file.proxy_user_data.0.rendered
-  tags               = concat([digitalocean_tag.project.name], split(",", format("consul_cluster_name_%s-%s,project_%s", var.project_name, "consul", var.project_name)))
-  private_networking = true
+resource "aws_instance" "proxy" {
+
+  ami               = var.proxy_image_name
+  instance_type     = var.proxy_compute_flavor_name
+  key_name          = aws_key_pair.project_ssh_key.key_name
+  availability_zone = var.project_availability_zone
+  user_data         = data.template_file.proxy_user_data.0.rendered
+
+  associate_public_ip_address = true
+  subnet_id                   = aws_subnet.public.id
+  vpc_security_group_ids      = [aws_security_group.common.id, aws_security_group.public_subnet.id, aws_security_group.web.id]
+
+  depends_on = [aws_internet_gateway.this]
+  tags = {
+    Name = format("%s-proxy", var.project_name)
+  }
 }
 
-data "digitalocean_floating_ip" "proxy_floatingip" {
+data "aws_eip" "proxy_floatingip" {
   count = var.proxy_prefered_floating_ip != "" ? var.enable_proxy * 1 : 0
 
-  ip_address = var.proxy_prefered_floating_ip
+  public_ip = var.proxy_prefered_floating_ip
 }
 
-resource "digitalocean_floating_ip" "proxy_floatingip" {
+resource "aws_eip" "proxy_floatingip" {
   count = var.proxy_prefered_floating_ip == "" ? var.enable_proxy * 1 : 0
-
-  region = var.project_availability_zone
 }
 
-resource "digitalocean_floating_ip_assignment" "proxy_floatingip_associate" {
+resource "aws_eip_association" "proxy_floatingip_associate" {
   count = var.enable_proxy
 
-  ip_address = var.proxy_prefered_floating_ip != "" ? var.proxy_prefered_floating_ip : digitalocean_floating_ip.proxy_floatingip.0.ip_address
-  droplet_id = digitalocean_droplet.proxy.id
+  allocation_id = var.proxy_prefered_floating_ip != "" ? data.aws_eip.proxy_floatingip.0.id : aws_eip.proxy_floatingip.0.id
+  instance_id   = aws_instance.proxy.id
 }

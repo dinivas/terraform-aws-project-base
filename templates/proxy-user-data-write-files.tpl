@@ -64,11 +64,12 @@
         allow_sign_up = true
         client_id = ${keycloak_grafana_client_id}
         client_secret = ${keycloak_grafana_client_secret}
-        scopes = user:email
+        scopes = profile
         email_attribute_name = email:primary
         auth_url = ${project_keycloak_scheme}://${project_keycloak_host}/auth/realms/${project_keycloak_realm}/protocol/openid-connect/auth
         token_url = ${project_keycloak_scheme}://${project_keycloak_host}/auth/realms/${project_keycloak_realm}/protocol/openid-connect/token
         api_url = ${project_keycloak_scheme}://${project_keycloak_host}/auth/realms/${project_keycloak_realm}/protocol/openid-connect/userinfo
+        role_attribute_path = contains(realm_access.roles[*], 'Grafana Admin') && 'Admin' || contains(realm_access.roles[*], 'Grafana Editor') && 'Editor' || 'Viewer'
         team_ids =
         allowed_organizations =
         tls_skip_verify_insecure = false

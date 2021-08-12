@@ -1,5 +1,5 @@
 output "bastion_instance_id" {
-  value = digitalocean_droplet.bastion.id
+  value = aws_instance.bastion.id
 }
 
 output "bastion_private_key" {
@@ -15,11 +15,11 @@ output "project_private_key" {
 }
 
 output "mgmt_network_id" {
-  value       = module.mgmt_network.vpc_id
+  value       = aws_vpc.this.id
   description = "The id of the Mgmt Network being created"
 }
 output "mgmt_network_name" {
-  value       = module.mgmt_network.vpc_name
+  value       = aws_vpc.this.id
   description = "The name of the Mgmt Network being created"
 }
 
@@ -29,22 +29,22 @@ output "bastion_floating_ip" {
 }
 
 output "proxy_floating_ip" {
-  value       = digitalocean_floating_ip_assignment.proxy_floatingip_associate.0.ip_address
+  value       = aws_eip_association.proxy_floatingip_associate.0.public_ip
   description = "The floating ip bind to proxy"
 }
 
 output "project_keypair_name" {
-  value       = module.project_ssh_key.name
+  value       = aws_key_pair.project_ssh_key.key_name
   description = "Default keypair used for project hosts"
 }
 
 
 output "consul_server_instance_ids" {
-  value = digitalocean_droplet.consul_server.*.id
+  value = aws_instance.consul_server.*.id
 }
 
 output "consul_client_instance_ids" {
-  value = digitalocean_droplet.consul_client.*.id
+  value = aws_instance.consul_client.*.id
 }
 
 output "ssh_via_bastion_config" {
